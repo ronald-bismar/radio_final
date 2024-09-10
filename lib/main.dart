@@ -3,8 +3,14 @@ import 'package:provider/provider.dart';
 import 'package:radio_final/providers/audio_provider.dart';
 import 'package:radio_final/providers/theme_provider.dart';
 import 'package:radio_final/screens/home_page.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 
-void main() {
+Future<void> main() async {
+  await JustAudioBackground.init(
+    androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
+    androidNotificationChannelName: 'Audio playback',
+    androidNotificationOngoing: true,
+  );
   runApp(
     Builder(
       builder: (context) => MultiProvider(

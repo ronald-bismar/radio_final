@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 
 class AudioProvider extends ChangeNotifier {
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -20,16 +21,29 @@ class AudioProvider extends ChangeNotifier {
   static const String _url = 'http://stream.zeno.fm/fd9bandxezzuv';
 
   AudioProvider() {
-    _audioPlayer.setUrl(_url);
+    _initAudioPlayer();
     _monitorConnectivity();
   }
 
-  Future togglePlay() async {
+  Future<void> _initAudioPlayer() async {
+    await _audioPlayer.setAudioSource(AudioSource.uri(
+      Uri.parse(_url),
+      tag: MediaItem(
+        id: '1',
+        album: "Radio Filadelfia",
+        title: "Radio Filadelfia en vivo",
+        artUri: Uri.parse(
+            "https://www.google.com/imgres?q=centro%20evangelistico%20filadelfia%20filadelfia%20radio%20bolivia&imgurl=https%3A%2F%2Flookaside.fbsbx.com%2Flookaside%2Fcrawler%2Fmedia%2F%3Fmedia_id%3D3081496891942601&imgrefurl=https%3A%2F%2Fwww.facebook.com%2Fgroups%2F301882104168053%2F&docid=UqpNQSDZwBP-IM&tbnid=EKMMaqDrYD7dHM&vet=12ahUKEwiL35iA2reIAxW5E7kGHRQiOG8QM3oECBkQAA..i&w=640&h=640&hcb=2&ved=2ahUKEwiL35iA2reIAxW5E7kGHRQiOG8QM3oECBkQAA"),
+      ),
+    ));
+  }
+
+  Future<void> togglePlay() async {
     _isPlaying = !_isPlaying;
     notifyListeners();
     if (!_isPlaying) {
       _stopTimer();
-      await _audioPlayer.stop();
+      await _audioPlayer.pause();
     } else {
       _startTimer();
       await _audioPlayer.play();
@@ -66,7 +80,6 @@ class AudioProvider extends ChangeNotifier {
       (ConnectivityResult result) async {
         if (result != ConnectivityResult.none && _isPlaying) {
           try {
-            // Verifica si ya está reproduciendo antes de intentar reproducir nuevamente
             if (!_audioPlayer.playing) {
               await _audioPlayer.play();
             }
